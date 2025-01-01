@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript Loader User Manual</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        h1 {
+            color: #0056b3;
+        }
+        pre {
+            background: #1e1e1e;
+            color: #dcdcdc;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            position: relative;
+        }
+        code {
+            font-family: "Courier New", Courier, monospace;
+        }
+        section {
+            margin-bottom: 20px;
+        }
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+        }
+        .copy-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #0056b3;
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        .copy-button:hover {
+            background: #003d82;
+        }
+        .hljs-keyword {
+            color: #569cd6;
+        }
+        .hljs-string {
+            color: #d69d85;
+        }
+        .hljs-number {
+            color: #b5cea8;
+        }
+        .hljs-comment {
+            color: #6a9955;
+        }
+    </style>
+    <script>
+        function copyToClipboard(button) {
+            const codeBlock = button.previousElementSibling;
+            navigator.clipboard.writeText(codeBlock.textContent)
+                .then(() => {
+                    button.textContent = "Copied!";
+                    setTimeout(() => button.textContent = "Copy", 2000);
+                })
+                .catch(err => console.error("Failed to copy code: ", err));
+        }
+    </script>
+</head>
+<body>
+    <h1>JavaScript Loader User Manual</h1>
+    <p>This document provides instructions and a reusable script for dynamically loading multiple JavaScript files. It supports scripts stored in the same folder, subfolders, or parent directories.</p>
+
+    <section>
+        <h2>Overview</h2>
+        <p>The provided code dynamically loads JavaScript files listed in an array and logs their status (success or failure) to the console. This approach is scalable, allowing you to manage scripts from one or more folders with ease.</p>
+    </section>
+
+    <section>
+        <h2>Code Examples</h2>
+        <h3>1. All Scripts in the Same Folder</h3>
+        <p>Use the following code if all your scripts and the loader file are in the same folder:</p>
+        <pre><code class="hljs">// Current folder as the base
+const folders = ['.']; // Use '.' for the current folder
+
+const scriptNames = [
+    'Theme',
+    'scroll',
+    'Re-Orderer',
+    'Editor',
+    'Opn_Editor',
+    'Hide_Editor',
+    'elements',
+    'countdown',
+    'clock',
+    'BG',
+    'Download_HnDLR',
+    'Add_NEW+'
+];
+
+const scripts = folders.flatMap(folder =>
+    scriptNames.map(name => `${folder}/${name}.js`)
+);
+
+function loadScript(src) {
+    return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = src;
+        script.onload = () => resolve(`${src} loaded successfully`);
+        script.onerror = () => reject(new Error(`Failed to load script: ${src}`));
+        document.head.appendChild(script);
+    });
+}
+
+Promise.all(scripts.map(loadScript))
+    .then(messages => {
+        messages.forEach(message => console.log(message));
+        console.log("All scripts loaded successfully!");
+    })
+    .catch(error => console.error(error));</code>
+        <button class="copy-button" onclick="copyToClipboard(this)">Copy</button>
+        </pre>
+
+        <h3>2. Scripts in a Subfolder</h3>
+        <p>If your scripts are stored in a subfolder (e.g., <code>Functions</code>), update the <code>folders</code> array:</p>
+        <pre><code class="hljs">// Subfolder as the base
+const folders = ['Functions']; // Scripts are in the "Functions" subfolder
+
+// Follow the same structure as before
+const scriptNames = [
+    'Theme',
+    'scroll',
+    'Re-Orderer',
+    ...
+];</code>
+        <button class="copy-button" onclick="copyToClipboard(this)">Copy</button>
+        </pre>
+
+        <h3>3. Scripts in Parent Directories</h3>
+        <p>If your scripts are in a parent directory, use <code>../</code> or <code>../../</code> as needed:</p>
+        <pre><code class="hljs">// Parent folder as the base
+const folders = ['../scripts']; // Scripts are in the "scripts" folder, one level up
+
+// Or multiple levels up
+const folders = ['../../Functions'];</code>
+        <button class="copy-button" onclick="copyToClipboard(this)">Copy</button>
+        </pre>
+
+        <h3>4. Scripts Across Multiple Folders</h3>
+        <p>For multiple folders, include all paths in the <code>folders</code> array:</p>
+        <pre><code class="hljs">// Multiple folders
+const folders = ['Functions', '../scripts', '../../Modules'];</code>
+        <button class="copy-button" onclick="copyToClipboard(this)">Copy</button>
+        </pre>
+    </section>
+
+    <section>
+        <h2>Usage</h2>
+        <ol>
+            <li>Place your JavaScript files in the specified folder(s).</li>
+            <li>Update the <code>folders</code> and <code>scriptNames</code> arrays to match your structure.</li>
+            <li>Include the loader script in your HTML file using:
+                <pre><code class="hljs">&lt;script src="loader.js" defer&gt;&lt;/script&gt;</code>
+                <button class="copy-button" onclick="copyToClipboard(this)">Copy</button>
+                </pre>
+            </li>
+            <li>Open your project in a browser and check the console for loading status logs.</li>
+        </ol>
+    </section>
+
+    <section>
+        <h2>Features</h2>
+        <ul>
+            <li><strong>Dynamic Paths:</strong> The paths to the scripts are built dynamically, making it easy to change the folder structure.</li>
+            <li><strong>Scalability:</strong> Supports loading files from multiple folders if required.</li>
+            <li><strong>Error Handling:</strong> Logs an error message if a script fails to load.</li>
+            <li><strong>Promises:</strong> Ensures all scripts are loaded before proceeding further.</li>
+        </ul>
+    </section>
+
+    <footer>
+        &copy; 2025 Your Project. All rights reserved.
+    </footer>
+</body>
+</html>
